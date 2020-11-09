@@ -37,6 +37,7 @@ type Config struct {
 	SvidBundleFileName       string `hcl:"svidBundleFileName"`
 	RenewSignal              string `hcl:"renewSignal"`
 	Timeout                  string `hcl:"timeout"`
+	RetrieveAndExit          bool   `hcl:"retrieveAndExit"`
 	ReloadExternalProcess    func() error
 }
 
@@ -132,6 +133,11 @@ func updateCertificates(s *Sidecar, svidResponse *proto.X509SVIDResponse) {
 		log.Printf("unable to dump bundle: %v", err)
 		return
 	}
+
+	if s.config.RetrieveAndExit {
+		os.Exit(0)
+	}
+
 	err = s.signalProcess()
 	if err != nil {
 		log.Printf("unable to signal process: %v", err)
